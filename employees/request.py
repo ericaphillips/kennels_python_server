@@ -71,3 +71,16 @@ def create_employee(employee):
     #Return the dictionary with 'id' property added
     return employee
 
+def delete_employee(id):
+    #Initial -1 value for employee index in case one isn't found
+    employee_index = -1
+
+    #iterate the EMPLOYEES list, use enumerate()
+    #so you can access index value of each
+    for index, employee in enumerate(EMPLOYEES):
+        if employee["id"] == id:
+            #found the employee, store the current index
+            employee_index = index
+    #If employee was found, use pop(int) to remove it from list
+    if employee_index >= 0:
+        EMPLOYEES.pop(employee_index)
