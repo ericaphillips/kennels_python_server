@@ -4,19 +4,22 @@ CUSTOMERS = [
       "email": "test1@test1.com",
       "password": "yeety",
       "name": "test1 test1",
-      "id": 1
+      "id": 1,
+      "status": "Active"
     },
     {
       "email": "test2@test2.com",
       "password": "yeety2",
       "name": "test2 test2",
-      "id": 2
+      "id": 2,
+      "status": "Active"
     },
     {
       "email": "test3@test3.com",
       "password": "yeety3",
       "name": "test3 test3",
-      "id": 3
+      "id": 3,
+      "status": "Archived"
     }
 ]
 
@@ -67,3 +70,12 @@ def delete_customer(id):
     #If customer was found, use pop(int) to remove it from list
     if customer_index >= 0:
         CUSTOMERS.pop(customer_index)
+
+def update_customer(id, new_customer): 
+    #Iterate CUSTOMERS list
+    #Use enumerate() so you can access index of each item
+    for index, customer in enumerate(CUSTOMERS):
+        if customer["id"] == id:
+            #Found the customer, update the value
+            CUSTOMERS[index] = new_customer
+            break
