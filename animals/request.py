@@ -67,7 +67,7 @@ def delete_animal(id):
 
     #iterate the ANIMALS list, but use enumerate()
     #so you can access the index value of each
-    for index, animal in enumerate(ANIMALS):
+    for (index, animal) in enumerate(ANIMALS):
         if animal["id"] == id:
             #Found the animal. Store the current index
             animal_index = index
