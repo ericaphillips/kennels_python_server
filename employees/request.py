@@ -1,3 +1,7 @@
+import json
+import sqlite3
+from models import Employee
+
 EMPLOYEES = [
     {
       "name": "Daniel Smith",
@@ -43,23 +47,66 @@ EMPLOYEES = [
     }
   ]
 
+
 def get_all_employees():
-    return EMPLOYEES
+  #Open a xonnection to the database
+  with sqlite3.connect("./kennel.db") as conn:
+
+    conn.row_factory = sqlite3.Row
+    db_cursor = conn.cursor()
+
+    #Write SQL query to get info wanted
+    db_cursor.execute("""
+    SELECT
+      e.id,
+      e.name,
+      e.address,
+      e.location_id
+    FROM employee e
+    """)
+
+    #Initialize an empty list to hold all employee representations
+    employees = []
+
+    #Convert rows of data into a Python list
+    dataset = db_cursor.fetchall()
+
+    #Iterate the list of data returned
+    for row in dataset:
+
+      #Create an employee instance from the current row
+      #Database fields are specified in exact order
+      #of parameters defined in Employee class
+      employee = Employee(row['id'], row['name'], row['address'], row['location_id'])
+      employees.append(employee.__dict__)
+  #USe json package to serialize list as JSON
+  return json.dumps(employees)
 
 #Function with a single parameter
 def get_single_employee(id):
-    #Variable to hold the found employee if it exists
-    requested_employee = None
+  with sqlite3.connect("./kennel.db") as conn:
+    conn.row_factory = sqlite3.Row
+    db_cursor = conn.cursor()
 
-    #Iterate the EMPLOYEES list
-    #like for...of loops in JS
+    #Use a ? parameter to inject a variable's value 
+    #into a SQL statement
+    db_cursor.execute("""
+    SELECT
+      e.id,
+      e.name,
+      e.address,
+      e.location_id
+    FROM employee e
+    WHERE e.id = ?
+    """, ( id, ))
 
-    for employee in EMPLOYEES:
-        #Dictionaries in Python use [] instead of dot notation
-        if employee["id"] == id:
-            requested_employee = employee
+    #Load the single result into memory
+    data = db_cursor.fetchone()
 
-    return requested_employee
+    #Create employee instance from the current row
+    employee = Employee(data['id'], data['name'], data['address'], data['location_id'])
+
+    return json.dumps(employee.__dict__)
 
 def create_employee(employee):
     #Get the id value of the last employee on list

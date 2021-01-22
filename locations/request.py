@@ -1,3 +1,7 @@
+import sqlite3
+import json
+from models import Location
+
 LOCATIONS = [
     {
       "id": 1,
@@ -14,21 +18,59 @@ LOCATIONS = [
 ]
 
 def get_all_locations():
-    return LOCATIONS
+    #open a connection to the database
+    with sqlite3.connect("./kennel.db") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
+
+        #Write the SQL query to get info you want
+        db_cursor.execute("""
+        SELECT
+            l.id,
+            l.name,
+            l.address
+        FROM location l
+        """)
+
+        #initialize an empty list to hold all locations
+        locations = []
+
+        #convert rows of data into a Python list
+        dataset = db_cursor.fetchall()
+
+        #iterate the list of data returned from database
+        for row in dataset:
+
+            #create a location instance from the current row
+            #The database fields are specifid in exact order
+            #of the parameters defined in Location class
+            location = Location(row['id'], row['name'], row['address'])
+            locations.append(location.__dict__)
+    #use json package to serialize list as JSON
+    return json.dumps(locations)
 
 def get_single_location(id):
-    #Variable to hold the found location if it exists
-    requested_location = None
+    with sqlite3.connect("./kennel.db") as conn:
+        conn.row_factory = sqlite3.Row
+        db_cursor = conn.cursor()
 
-    #iterate through LOCATIONS
-    ##like for...of loops in javascript
+        #Use ? as parameter to inject a variable's value into SQL statement
+        db_cursor.execute("""
+        SELECT 
+            l.id,
+            l.name,
+            l.address
+        FROM location l
+        WHERE l.id = ?
+        """, ( id, )) 
 
-    for location in LOCATIONS:
-        #Dictionaries in Python use [] notation to find key
-        if location["id"] == id:
-            requested_location = location
+        #load the single result into memory
+        data = db_cursor.fetchone()
 
-    return requested_location
+        #Create location instance from the current row
+        location = Location(data['id'], data['name'], data['address'])
+
+        return json.dumps(location.__dict__)
 
 def create_location(location):
     #Get the id value of the last location in the list
