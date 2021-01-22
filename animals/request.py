@@ -65,20 +65,20 @@ def create_animal(animal):
     #Return the dictionary with 'id' property added
     return animal
 
-def delete_animal(id):
-    #Initial -1 value for animal index, in case one isn't found
-    animal_index = -1
+# def delete_animal(id):
+#     #Initial -1 value for animal index, in case one isn't found
+#     animal_index = -1
 
-    #iterate the ANIMALS list, but use enumerate()
-    #so you can access the index value of each
-    for (index, animal) in enumerate(ANIMALS):
-        if animal["id"] == id:
-            #Found the animal. Store the current index
-            animal_index = index
+#     #iterate the ANIMALS list, but use enumerate()
+#     #so you can access the index value of each
+#     for (index, animal) in enumerate(ANIMALS):
+#         if animal["id"] == id:
+#             #Found the animal. Store the current index
+#             animal_index = index
 
-    #If the animal was found, use pop(int) to remove it from list
-    if animal_index >= 0:
-        ANIMALS.pop(animal_index)
+#     #If the animal was found, use pop(int) to remove it from list
+#     if animal_index >= 0:
+#         ANIMALS.pop(animal_index)
 
 def update_animal(id, new_animal):
     #Iterate the ANIMALS list
@@ -215,4 +215,11 @@ def get_animals_by_status(status):
             
     return json.dumps(animals)
 
+def delete_animal(id):
+    with sqlite3.connect("./kennel.db") as conn:
+        db_cursor = conn.cursor()
 
+        db_cursor.execute("""
+        DELETE FROM Animal
+        WHERE id =?
+        """, ( id, ))
